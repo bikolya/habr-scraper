@@ -14,11 +14,10 @@ filter = filters[:it]
 
 data = Nokogiri::HTML(open(url, "User-Agent" => "Mac Safari"))
 
-filtered_data = data.css('.post_title').select { |title| title.text =~ /#{filter[0]}.*#{filter[1]}/ }
-filtered_data = filtered_data.map { |title| title.text }
-numbers = filtered_data.map { |title| title.match(/№\d*/)[0][1..-1] }
+titles = data.css('.post_title').map { |title| title.text if title.text =~ /#{filter[0]}.*#{filter[1]}/ }.compact
+numbers = titles.map { |title| title.match(/№\d*/)[0][1..-1] }
 
-info = numbers.zip(filtered_data)
+info = numbers.zip(titles)
 
 # info[0] - number of digest
 # info[1] - title
