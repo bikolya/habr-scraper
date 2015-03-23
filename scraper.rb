@@ -3,7 +3,19 @@ require 'open-uri'
 
 url = ARGV[0] || "http://habrahabr.ru/company/zfort/"
 
+filters = ["Дайджест", "IT"]
+
 data = Nokogiri::HTML(open(url, "User-Agent" => "Mac Safari"))
 
-data.css('.post_title').each { |title| puts title.text }
+filtered_data = data.css('.post_title').select { |title| title.text =~ /#{filters[0]}.*#{filters[1]}/ }
+filtered_data = filtered_data.map { |title| title.text }
+numbers = filtered_data.map { |title| title.match(/№\d*/)[0][1..-1] }
+
+info = numbers.zip(filtered_data)
+
+# info[0] - number of digest
+# info[1] - title
+info.each do |post|
+  puts [post[0], post[1]].join(", ")
+end
 
