@@ -3,11 +3,18 @@ require 'open-uri'
 
 url = ARGV[0] || "http://habrahabr.ru/company/zfort/"
 
-filters = ["Дайджест", "IT"]
+filters = { it:      ["Дайджест", "IT"],
+            php:     [],
+            webdev:  [],
+            python:  [],
+            bigdata: []
+          }
+
+filter = filters[:it]
 
 data = Nokogiri::HTML(open(url, "User-Agent" => "Mac Safari"))
 
-filtered_data = data.css('.post_title').select { |title| title.text =~ /#{filters[0]}.*#{filters[1]}/ }
+filtered_data = data.css('.post_title').select { |title| title.text =~ /#{filter[0]}.*#{filter[1]}/ }
 filtered_data = filtered_data.map { |title| title.text }
 numbers = filtered_data.map { |title| title.match(/№\d*/)[0][1..-1] }
 
