@@ -76,7 +76,7 @@ finish = Time.now
 puts "Completed in #{finish - start}"
 
 # csv[0] - number of digest
-# csv[1] - raings
+# csv[1] - ratings
 # csv[2] - views
 # csv[3] - stars
 # csv[4] - comments
