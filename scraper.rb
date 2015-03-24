@@ -12,33 +12,6 @@ class Scraper
               bigdata: ["Обзор", "анализу", "обучению"]
             }
 
-  def set_data(posts)
-    @titles = posts.css('.post_title').map{ |title| title.text }
-    @numbers = @titles.map{ |title| title.gsub(/[\s\-]/, "").match(/[№#]\d*/)[0][1..-1].to_i if title.match(/№\d*/) }
-    @ratings = posts.css('.score').map{ |score| score.text =~ /\d/ ? score.text.to_i : 0 }
-    @views = posts.css('.pageviews').map{ |views| views.text.to_i }
-    @stars = posts.css('.favs_count').map{ |stars| stars.text.to_i }
-    @comments = posts.css('.comments .all').map{ |comments| comments.text.to_i }
-  end
-
-  def zip_all
-    @numbers.zip(@ratings, @views, @stars, @comments, @titles)
-  end
-
-  def filtered(info, filter)
-    info.select do |post|
-      post[5] =~ /#{filter[0]}.*#{filter[1]}/ || post[5] =~ /#{filter[0]}.*#{filter[2]}/ && post[0]
-    end
-  end
-
-  def write_to_csv(data, dest)
-    CSV.open(dest, "w") do |csv|
-      data.each do |post|
-        csv << post
-      end
-    end
-  end
-
   def scrape_to_csv(base_url, filter, dest)
     page = 1
     result = []
@@ -59,6 +32,35 @@ class Scraper
     result.sort_by!(&:first)
     write_to_csv(result, dest)
   end
+
+  private
+
+    def set_data(posts)
+      @titles = posts.css('.post_title').map{ |title| title.text }
+      @numbers = @titles.map{ |title| title.gsub(/[\s\-]/, "").match(/[№#]\d*/)[0][1..-1].to_i if title.match(/№\d*/) }
+      @ratings = posts.css('.score').map{ |score| score.text =~ /\d/ ? score.text.to_i : 0 }
+      @views = posts.css('.pageviews').map{ |views| views.text.to_i }
+      @stars = posts.css('.favs_count').map{ |stars| stars.text.to_i }
+      @comments = posts.css('.comments .all').map{ |comments| comments.text.to_i }
+    end
+
+    def zip_all
+      @numbers.zip(@ratings, @views, @stars, @comments, @titles)
+    end
+
+    def filtered(info, filter)
+      info.select do |post|
+        post[5] =~ /#{filter[0]}.*#{filter[1]}/ || post[5] =~ /#{filter[0]}.*#{filter[2]}/ && post[0]
+      end
+    end
+
+    def write_to_csv(data, dest)
+      CSV.open(dest, "w") do |csv|
+        data.each do |post|
+          csv << post
+        end
+      end
+    end
 end
 
 
